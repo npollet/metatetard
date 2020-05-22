@@ -1,0 +1,21 @@
+---
+title: "Transmission"
+author: "N. Pollet"
+date: "13/05/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+### Analysis of the transmission of Xenopus microbiomes from adult skin and feces to eggs.
+
+-[Phyla abundances and UniFrac ordination](xptransmission_analyse1_phyloseq.html)
+
+-[PhilR ordination](xptransmission_philr_analysis.html)
+
+-[Alpha and beta diversity](xptransmission_analysis_nmt3.html)
+
+-[Feast source-sink analysis](xptransmission_feast_results_display.html)
+
+-[Simple analysis of transmission](xptransmission_plot_tt.html)

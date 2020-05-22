@@ -1,0 +1,14 @@
+---
+title: "Adult"
+author: "N. Pollet"
+date: "13/05/2020"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+### Analysis of adult Xenopus microbiomes from skin, gastro-intestinal tract organs and feces.
+
+-[Phyla abundances and UniFrac ordination](xpgut_analyse1_phyloseq.html)
+
+-[Alpha and beta diversity](xpgut_analysis_nmt3.html)

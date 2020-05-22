@@ -1,0 +1,14 @@
+name: "metatetard"
+output_dir: "docs"
+navbar:
+  title: "Metatetard"
+  left:
+  - text: "Home"
+   href: index.html
+  - text: "LifeStages"
+   href: LifeStages.html
+  -text: "Adult"
+   href: Adul.html
+output:
+  html_document:
+ theme: cosmo

@@ -1,0 +1,28 @@
+---
+title: "LifeStages"
+author: "N. Pollet"
+date: "13/05/2020"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+### Analysis of Xenopus microbiomes from gastro-intestinal tract over life stages.
+
+-[Bacterial Phyla abundances](xpdev_dev_abundance_phyloseq.html)
+
+-[UniFrac ordination](xpdev_analyse_ordination_phyloseq.html)
+
+-[PhilR ordination script](xpdev_philr_analysis.html)
+
+-[Preparation of files for Venn diagram script](xpdev_analyse_venn.html)
+
+-[Prevalence analysis script](xpdev_prevalence.html)
+
+-[Alpha and beta diversity](xpdev_analysis2_nmt3_stage.html)
+
+-[Differential analysis of OTUs abundances](xpdev_deseq_in_phyloseq.html)
+
+-[UniFrac distances](xpdev_unifrac_distance.html)
+
+-[Rarefaction curves of all samples](xpall_rarefaction_phyloseq.html)

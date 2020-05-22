@@ -1,0 +1,18 @@
+---
+title: "Diet"
+author: "N. Pollet"
+date: "13/05/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+### Analysis of the impact of the diet on Xenopus gastro-intestinal tract microbiomes at tadpole stage.
+
+
+-[Phyla abundances and UniFrac ordination](xpdiet_analysis1_phyloseq.html)
+
+-[Differential analysis of OTU abundances](xpdiet_deseq_in_phyloseq.html)
+
+-[Alpha and beta diversity](xpdiet_analysis_nmt3_food.html)
