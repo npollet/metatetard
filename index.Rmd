@@ -8,6 +8,7 @@ output: html_document
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
+![Metatetard](images/metatetard_visuel.jpg)
 
 You will find here a set of R scripts dealing with the analysis of ***Xenopus* microbiomes**.
 
@@ -20,3 +21,5 @@ You will find here a set of R scripts dealing with the analysis of ***Xenopus* m
 - analysis of active communities at [early and late](EarlyLate.html) life stages
 
 - analysis of communities transmitted [between adult skin and feces toward eggs](Transmission.html)
+
+- analysis of the [metagenome and metatranscriptome](Metagenome.html) including metabolic pathways inference 

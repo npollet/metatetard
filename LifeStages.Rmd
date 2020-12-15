@@ -9,6 +9,8 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 ### Analysis of Xenopus microbiomes from gastro-intestinal tract over life stages.
 
+-[Significance Analysis of Cytometry data](cytometry.html)
+
 -[Bacterial Phyla abundances](xpdev_dev_abundance_phyloseq.html)
 
 -[UniFrac ordination](xpdev_analyse_ordination_phyloseq.html)
@@ -26,3 +28,5 @@ knitr::opts_chunk$set(echo = TRUE)
 -[UniFrac distances](xpdev_unifrac_distance.html)
 
 -[Rarefaction curves of all samples](xpall_rarefaction_phyloseq.html)
+
+-[Breakaway analysis](xpdev_breakaway.html)
