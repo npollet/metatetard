@@ -1,0 +1,47 @@
+---
+title: "Metagenome"
+author: "N. Pollet"
+date: "13/12/2020"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+### Analysis of Xenopus metagenome and metatranscriptome
+
+
+#### Taxonomic affiliations using full-length rRNA gene sequences
+
+-Krona plot of [taxonomic affiliations obtained from MATAM on metaDNA](Figure_S9_metaDNA_MATAM_krona.html)
+```
+# Run matam on metaDNA
+DBDIR=/home/Databases/MATAM
+matam_assembly.py -d $DBDIR/SILVA_128_SSURef_NR95 -i reads4matam/metaDNA_reads.fastq --cpu 24 --max_memory 50000 -v --perform_taxonomic_assignment -o matam_output
+```
+-Krona plot of [phyloFlash results on metaDNA](Figure_S10_metaDNA.phyloFlash.html)
+```
+# Run phyloflash on metaDNA
+phyloFlash.pl -lib metaDNA -read1 READ_QC/metatetard_DNA/final_pure_reads_1.fastq -read2 READ_QC/metatetard_DNA/final_pure_reads_2.fastq -CPUs 24 -everything
+```
+-Krona plot of [taxonomic affiliations obtained from MATAM on metaRNA](Figure_S11_metaRNA_MATAM_krona.html)
+```
+# Run matam on metaRNA
+DBDIR=/home/Databases/MATAM
+matam_assembly.py -d $DBDIR/SILVA_128_SSURef_NR95 -i reads4matam/metaRNA_reads.fastq --cpu 72 --max_memory 500000 -v --perform_taxonomic_assignment --coverage_threshold 500 --min_read_node 2 --min_overlap_edge 2 --resume_from graph_compaction -o matam_output
+```
+-Krona plot of [phyloFlash results on metaRNA](Figure_S12_metaRNA.phyloFlash.html)
+```
+# Run phyloflash on metaRNA
+phyloFlash.pl -lib metaRNA -read1 final_pure_reads_1.fastq -read2 final_pure_reads_2.fastq -CPUs 24 -everything -trusted Xt_metatrin.fasta
+```
+### Visualisation of metagenome bins using vizbin
+
+-Vizbin of [DASTool binning results](Script_vizbin_DAS.html)
+
+#### Metabolic pathways inference
+
+-Krona plot of [KEGG metabolic pathways](Figure_S13_metaDNA.kegg.minpath.html)
+
+-Krona plot of [Metacyc metabolic pathways](Figure_S14_metaDNA.metacyc.minpath.html)
+
+-iPath3 visualization is available [here](https://pathways.embl.de/ipath3.cgi?s=pWbci4bo871W8Qm8XKF&map=metabolic)
