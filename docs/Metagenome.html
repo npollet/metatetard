@@ -326,7 +326,11 @@ $(document).ready(function () {
 <div id="TOC">
 <ul>
 <li><a href="#analysis-of-xenopus-metagenome-and-metatranscriptome">Analysis of Xenopus metagenome and metatranscriptome</a></li>
+<li><a href="#section"></a></li>
+<li><a href="#read-krona.tab-output-files-from-matam">Read krona.tab output files from matam</a>
+<ul>
 <li><a href="#visualisation-of-metagenome-bins-using-vizbin">Visualisation of metagenome bins using vizbin</a></li>
+</ul></li>
 </ul>
 </div>
 
@@ -338,18 +342,80 @@ $(document).ready(function () {
 <pre><code># Run matam on metaDNA
 DBDIR=/home/Databases/MATAM
 matam_assembly.py -d $DBDIR/SILVA_128_SSURef_NR95 -i reads4matam/metaDNA_reads.fastq --cpu 24 --max_memory 50000 -v --perform_taxonomic_assignment -o matam_output</code></pre>
+<p>You can find the <a href="metaD%20NA_MATAM_final_assembly.fa">assembled sequences here</a></p>
 <p>-Krona plot of <a href="Figure_S10_metaDNA.phyloFlash.html">phyloFlash results on metaDNA</a></p>
 <pre><code># Run phyloflash on metaDNA
 phyloFlash.pl -lib metaDNA -read1 READ_QC/metatetard_DNA/final_pure_reads_1.fastq -read2 READ_QC/metatetard_DNA/final_pure_reads_2.fastq -CPUs 24 -everything</code></pre>
+<p>You can find the <a href="metaDNA.phyloFlash.all.final.fasta">assembled sequences here</a></p>
 <p>-Krona plot of <a href="Figure_S11_metaRNA_MATAM_krona.html">taxonomic affiliations obtained from MATAM on metaRNA</a></p>
 <pre><code># Run matam on metaRNA
+# This is a very intensive computation so you may need to tune the max_memory and coverage_threshold according to your needs.
 DBDIR=/home/Databases/MATAM
-matam_assembly.py -d $DBDIR/SILVA_128_SSURef_NR95 -i reads4matam/metaRNA_reads.fastq --cpu 72 --max_memory 500000 -v --perform_taxonomic_assignment --coverage_threshold 500 --min_read_node 2 --min_overlap_edge 2 --resume_from graph_compaction -o matam_output</code></pre>
+matam_assembly.py -d $DBDIR/SILVA_128_SSURef_NR95 -i reads4matam/metaRNA_reads.fastq --cpu 72 --max_memory 500000 -v --perform_taxonomic_assignment --coverage_threshold 500 --min_read_node 2 --min_overlap_edge 2 -o matam_output</code></pre>
+<p>You can find the <a href="metaRNA_MATAM_final_assembly.fa">assembled sequences here</a></p>
 <p>-Krona plot of <a href="Figure_S12_metaRNA.phyloFlash.html">phyloFlash results on metaRNA</a></p>
 <pre><code># Run phyloflash on metaRNA
 phyloFlash.pl -lib metaRNA -read1 final_pure_reads_1.fastq -read2 final_pure_reads_2.fastq -CPUs 24 -everything -trusted Xt_metatrin.fasta</code></pre>
+<p>You can find the <a href="metaRNA.phyloFlash.all.final.fasta">assembled sequences here</a></p>
 </div>
 </div>
+<div id="section" class="section level3">
+<h3></h3>
+</div>
+<div id="read-krona.tab-output-files-from-matam" class="section level1">
+<h1>Read krona.tab output files from matam</h1>
+<pre><code>#
+library(ggplot2)
+library(dplyr)
+library(ggbump)
+library(tidyr)
+
+source(&#39;theme_npgray.R&#39;)
+
+#Importing the krona.tab file produced by matam
+matam_mt&lt;-read.table(&quot;metatranscriptomic/mt.krona.tab&quot;,header=FALSE,sep=&quot;\t&quot;)
+matam_mg&lt;-read.table(&quot;metagenomic/mg.krona.tab&quot;,header=FALSE,sep=&quot;\t&quot;)
+
+#Assign headers - MT for the numbers of reads
+matam_mt&lt;-setNames(matam_mt,c(&quot;MT&quot;,&quot;Kingdom&quot;,&quot;Phylum&quot;,&quot;Class&quot;,&quot;Order&quot;,&quot;Family&quot;,&quot;Genus&quot;))
+matam_mg&lt;-setNames(matam_mg,c(&quot;MG&quot;,&quot;Kingdom&quot;,&quot;Phylum&quot;,&quot;Class&quot;,&quot;Order&quot;,&quot;Family&quot;,&quot;Genus&quot;))
+#Group by Phylum
+mt_by_phylum &lt;- matam_mt %&gt;% group_by(Phylum) %&gt;% summarise(MT=sum(MT))
+mg_by_phylum &lt;- matam_mg %&gt;% group_by(Phylum) %&gt;% summarise(MG=sum(MG))
+
+#Join the (two) datasets
+matam&lt;-full_join(mg_by_phylum,mt_by_phylum,by=&quot;Phylum&quot;)
+#Replace NA by 0
+matam&lt;-matam %&gt;% mutate_if(is.numeric, ~replace(., is.na(.), 0))
+
+#Compute percentages
+matam&lt;-matam %&gt;% mutate(MetaRNA=100*(MT/sum(MT)),MetaDNA=100*(MG/sum(MG)))
+
+#For working on read numbers
+#  matam %&gt;% pivot_longer(c(&#39;MT&#39;,&#39;MG&#39;),names_to=&quot;Experiment&quot;,values_to=&quot;Nb_reads&quot;)
+
+#Working only on percentages
+matam&lt;-matam %&gt;% select(Phylum,MetaRNA,MetaDNA) %&gt;% pivot_longer(c(&#39;MetaRNA&#39;,&#39;MetaDNA&#39;),names_to=&quot;Experiment&quot;,values_to=&quot;Percentage&quot;)
+
+# Plotting a stacked bar plot
+colors&lt;-c(&quot;Actinobacteria&quot;=&quot;#810027&quot;,&quot;Bacteroidetes&quot;=&quot;#92c5de&quot;,&quot;Cyanobacteria/Chloroplast&quot;=&quot;#f7f7f7&quot;,&quot;Deferribacteres&quot;=&quot;#f4a582&quot;,&quot;Firmicutes&quot;=&quot;#053061&quot;,&quot;Fusobacteria&quot;=&quot;#80cdc1&quot;,&quot;Lentisphaerae&quot;=&quot;#ffffff&quot;,&quot;Proteobacteria&quot;=&quot;#d6604d&quot;,&quot;Synergistetes&quot;=&quot;#2166ac&quot;,&quot;Verrucomicrobia&quot;=&quot;#fddbc7&quot;,&quot;unclassified&quot;=&quot;#f0f0f0&quot;)
+
+ggplot() +
+geom_bar(data = matam,
+aes(x = Experiment, y =Percentage, fill = Phylum),
+colour = &#39;black&#39;, width = 0.6, stat=&quot;identity&quot;) +
+geom_sigmoid(data = tidyr::spread(matam, Experiment, Percentage),
+colour = &quot;black&quot;,
+direction=&quot;x&quot;,
+smooth=6,
+aes(x = 1 + 0.6/2,
+xend = 2 - 0.6/2,
+y = 100-cumsum(MetaDNA),
+yend = 100-cumsum(MetaRNA)))+
+scale_fill_manual(values=colors)+
+theme_npgray()+coord_flip()
+
+ggsave(&quot;meta_matam_abundance.pdf&quot;,width=16,height=18,units=&quot;cm&quot;)</code></pre>
 <div id="visualisation-of-metagenome-bins-using-vizbin" class="section level3">
 <h3>Visualisation of metagenome bins using vizbin</h3>
 <p>-Vizbin of <a href="Script_vizbin_DAS.html">DASTool binning results</a></p>
@@ -358,6 +424,7 @@ phyloFlash.pl -lib metaRNA -read1 final_pure_reads_1.fastq -read2 final_pure_rea
 <p>-Krona plot of <a href="Figure_S13_metaDNA.kegg.minpath.html">KEGG metabolic pathways</a></p>
 <p>-Krona plot of <a href="Figure_S14_metaDNA.metacyc.minpath.html">Metacyc metabolic pathways</a></p>
 <p>-iPath3 visualization is available <a href="https://pathways.embl.de/ipath3.cgi?s=pWbci4bo871W8Qm8XKF&amp;map=metabolic">here</a></p>
+</div>
 </div>
 </div>
 

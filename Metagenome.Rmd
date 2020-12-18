@@ -18,25 +18,94 @@ knitr::opts_chunk$set(echo = TRUE)
 DBDIR=/home/Databases/MATAM
 matam_assembly.py -d $DBDIR/SILVA_128_SSURef_NR95 -i reads4matam/metaDNA_reads.fastq --cpu 24 --max_memory 50000 -v --perform_taxonomic_assignment -o matam_output
 ```
+You can find the [assembled sequences here](metaD
+NA_MATAM_final_assembly.fa)
+
 -Krona plot of [phyloFlash results on metaDNA](Figure_S10_metaDNA.phyloFlash.html)
 ```
 # Run phyloflash on metaDNA
 phyloFlash.pl -lib metaDNA -read1 READ_QC/metatetard_DNA/final_pure_reads_1.fastq -read2 READ_QC/metatetard_DNA/final_pure_reads_2.fastq -CPUs 24 -everything
 ```
+You can find the [assembled sequences here](metaDNA.phyloFlash.all.final.fasta)
+
+
 -Krona plot of [taxonomic affiliations obtained from MATAM on metaRNA](Figure_S11_metaRNA_MATAM_krona.html)
 ```
 # Run matam on metaRNA
+# This is a very intensive computation so you may need to tune the max_memory and coverage_threshold according to your needs.
 DBDIR=/home/Databases/MATAM
-matam_assembly.py -d $DBDIR/SILVA_128_SSURef_NR95 -i reads4matam/metaRNA_reads.fastq --cpu 72 --max_memory 500000 -v --perform_taxonomic_assignment --coverage_threshold 500 --min_read_node 2 --min_overlap_edge 2 --resume_from graph_compaction -o matam_output
+matam_assembly.py -d $DBDIR/SILVA_128_SSURef_NR95 -i reads4matam/metaRNA_reads.fastq --cpu 72 --max_memory 500000 -v --perform_taxonomic_assignment --coverage_threshold 500 --min_read_node 2 --min_overlap_edge 2 -o matam_output
 ```
+You can find the [assembled sequences here](metaRNA_MATAM_final_assembly.fa)
+
 -Krona plot of [phyloFlash results on metaRNA](Figure_S12_metaRNA.phyloFlash.html)
 ```
 # Run phyloflash on metaRNA
 phyloFlash.pl -lib metaRNA -read1 final_pure_reads_1.fastq -read2 final_pure_reads_2.fastq -CPUs 24 -everything -trusted Xt_metatrin.fasta
 ```
+You can find the [assembled sequences here](metaRNA.phyloFlash.all.final.fasta)
+
+###
+# Read krona.tab output files from matam
+```
+#
+library(ggplot2)
+library(dplyr)
+library(ggbump)
+library(tidyr)
+
+source('theme_npgray.R')
+
+#Importing the krona.tab file produced by matam
+matam_mt<-read.table("metatranscriptomic/mt.krona.tab",header=FALSE,sep="\t")
+matam_mg<-read.table("metagenomic/mg.krona.tab",header=FALSE,sep="\t")
+
+#Assign headers - MT for the numbers of reads
+matam_mt<-setNames(matam_mt,c("MT","Kingdom","Phylum","Class","Order","Family","Genus"))
+matam_mg<-setNames(matam_mg,c("MG","Kingdom","Phylum","Class","Order","Family","Genus"))
+#Group by Phylum
+mt_by_phylum <- matam_mt %>% group_by(Phylum) %>% summarise(MT=sum(MT))
+mg_by_phylum <- matam_mg %>% group_by(Phylum) %>% summarise(MG=sum(MG))
+
+#Join the (two) datasets
+matam<-full_join(mg_by_phylum,mt_by_phylum,by="Phylum")
+#Replace NA by 0
+matam<-matam %>% mutate_if(is.numeric, ~replace(., is.na(.), 0))
+
+#Compute percentages
+matam<-matam %>% mutate(MetaRNA=100*(MT/sum(MT)),MetaDNA=100*(MG/sum(MG)))
+
+#For working on read numbers
+#  matam %>% pivot_longer(c('MT','MG'),names_to="Experiment",values_to="Nb_reads")
+
+#Working only on percentages
+matam<-matam %>% select(Phylum,MetaRNA,MetaDNA) %>% pivot_longer(c('MetaRNA','MetaDNA'),names_to="Experiment",values_to="Percentage")
+
+# Plotting a stacked bar plot
+colors<-c("Actinobacteria"="#810027","Bacteroidetes"="#92c5de","Cyanobacteria/Chloroplast"="#f7f7f7","Deferribacteres"="#f4a582","Firmicutes"="#053061","Fusobacteria"="#80cdc1","Lentisphaerae"="#ffffff","Proteobacteria"="#d6604d","Synergistetes"="#2166ac","Verrucomicrobia"="#fddbc7","unclassified"="#f0f0f0")
+
+ggplot() +
+geom_bar(data = matam,
+aes(x = Experiment, y =Percentage, fill = Phylum),
+colour = 'black', width = 0.6, stat="identity") +
+geom_sigmoid(data = tidyr::spread(matam, Experiment, Percentage),
+colour = "black",
+direction="x",
+smooth=6,
+aes(x = 1 + 0.6/2,
+xend = 2 - 0.6/2,
+y = 100-cumsum(MetaDNA),
+yend = 100-cumsum(MetaRNA)))+
+scale_fill_manual(values=colors)+
+theme_npgray()+coord_flip()
+
+ggsave("meta_matam_abundance.pdf",width=16,height=18,units="cm")
+```
+
 ### Visualisation of metagenome bins using vizbin
 
 -Vizbin of [DASTool binning results](Script_vizbin_DAS.html)
+
 
 #### Metabolic pathways inference
 
